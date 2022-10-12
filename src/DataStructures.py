@@ -41,4 +41,3 @@ class RoadGraph:
     def addEdge(self, a, b, dist, azi, parentID):
         t = [b, dist, azi, parentID]
         self.adj[a].append(t)
-
