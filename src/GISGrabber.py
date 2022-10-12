@@ -2,7 +2,6 @@ import requests
 from geographiclib.geodesic import Geodesic
 from DataStructures import NodeData, RoadData, RoadMap, RoadGraph
 
-
 #this uses HTTP requests to get GIS data from OpenStreetMap
 class GISGrabber:
 
