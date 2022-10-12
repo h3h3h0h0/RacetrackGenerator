@@ -65,3 +65,5 @@ class GISGrabber:
                 finGraph.addEdgeByID(tn[i], tn[i+1], dist, az1, wid)
                 if not directional:
                     finGraph.addEdgeByID(tn[i+1], tn[i], dist, az2, wid)
+
+        return finGraph
