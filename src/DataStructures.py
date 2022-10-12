@@ -31,7 +31,7 @@ class RoadGraph:
             nc += 1
 
         #the adjacency list (we will have to run various algorithms on this graph later)
-        self.adj = [[] for i in range(nc)]
+        self.adj = [{} for i in range(nc)]
 
     #adds edge by node ID
     #parentID is to get the ID of the parent road, for road conditions info
@@ -39,5 +39,5 @@ class RoadGraph:
         self.addEdge(self.idToNum[id1], self.idToNum[id2]. dist, azi, parentID)
 
     def addEdge(self, a, b, dist, azi, parentID):
-        t = [b, dist, azi, parentID]
-        self.adj[a].append(t)
+        t = [dist, azi, parentID]
+        self.adj[a][b] = t
