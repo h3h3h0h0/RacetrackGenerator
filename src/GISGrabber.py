@@ -1,6 +1,7 @@
 import requests
+from geographiclib.geodesic import Geodesic
+from DataStructures import NodeData, RoadData, RoadMap, RoadGraph
 
-from DataStructures import NodeData, RoadData, RoadMap
 
 #this uses HTTP requests to get GIS data from OpenStreetMap
 class GISGrabber:
@@ -43,4 +44,25 @@ class GISGrabber:
 
         return RoadMap(finNodes, finWays)
 
+    #transform a roadmap object into a data structure that describes a graph with these roads
+    #has a choice to respect original road direction or not
+    def toGraph(self, rMap, directional=False):
+        rNodes = rMap.roadNodes
+        rWays = rMap.roadWays
 
+        finGraph = RoadGraph(rNodes)
+
+        #for each way, add the connection between adjacent nodes with appropriate info
+        for wid in rWays.keys():
+            tn = rWays[wid].nodes
+            for i in range(len(tn)-1):
+                lat1 = rNodes[tn[i]].lat
+                lat2 = rNodes[tn[i+1]].lat
+                lon1 = rNodes[tn[i]].lon
+                lon2 = rNodes[tn[i+1]].lon
+                dist = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)["s12"]
+                az1 = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)["azi1"]
+                az2 = Geodesic.WGS84.Inverse(lat2, lon2, lat1, lon1)["azi1"]
+                finGraph.addEdgeByID(tn[i], tn[i+1], dist, az1, wid)
+                if not directional:
+                    finGraph.addEdgeByID(tn[i+1], tn[i], dist, az2, wid)
