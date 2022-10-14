@@ -1,4 +1,5 @@
 import requests
+import OSMHandler
 from geographiclib.geodesic import Geodesic
 from DataStructures import NodeData, RoadData, RoadMap, RoadGraph
 
@@ -6,9 +7,9 @@ from DataStructures import NodeData, RoadData, RoadMap, RoadGraph
 class GISGrabber:
 
     #the URL is so that this may work with different versions of the map, and not just the current version
-    def __init__(self, url, handler):
+    def __init__(self, url):
         self.url = url
-        self.handler = handler
+        self.handler = OSMHandler()
 
     #get the map info for the area bounded by the specific coordinates, stores it in a file with the specified name
     def getArea(self, l, b, r, t, fileName):

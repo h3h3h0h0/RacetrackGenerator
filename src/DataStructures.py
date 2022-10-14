@@ -36,7 +36,7 @@ class RoadGraph:
     #adds edge by node ID
     #parentID is to get the ID of the parent road, for road conditions info
     def addEdgeByID(self, id1, id2, dist, azi, parentID):
-        self.addEdge(self.idToNum[id1], self.idToNum[id2]. dist, azi, parentID)
+        self.addEdge(self.idToNum[id1], self.idToNum[id2], dist, azi, parentID)
 
     def addEdge(self, a, b, dist, azi, parentID):
         t = [dist, azi, parentID]
