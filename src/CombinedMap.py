@@ -1,6 +1,7 @@
 import OSMHandler
 import GISGrabber
 from copy import deepcopy
+import queue
 
 #this is a class designed to wrap all the things needed to describe a completed map that is ready to be used
 class CombinedMap:
@@ -20,3 +21,12 @@ class CombinedMap:
         rc.roadGraph = GISGrabber.toGraph(rc.roadMap, rc.directional)
 
         return rc
+
+    #makes a route based on a set of points
+    def makeRoute(self, ids):
+        route = []
+        length = 0
+        l = [0 for i in range(len(self.roadGraph.adj))]
+        vis = [False for i in range(len(self.roadGraph.adj))]
+        q = queue.Queue()
+
