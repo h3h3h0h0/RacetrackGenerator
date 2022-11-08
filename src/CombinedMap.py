@@ -1,5 +1,5 @@
 import current as current
-
+from DataStructures import Route
 import OSMHandler
 import GISGrabber
 from copy import deepcopy
@@ -43,21 +43,37 @@ class CombinedMap:
         ce = self.roadGraph.idToNum[ids[1]]
         vis[cs] = True
         q.put(cs)
+        route.append(cs)
 
         for sec in range(1, len(self.roadGraph.adj)):
             while not q.empty():
                 cur = q.get()
                 for i in self.roadGraph.adj[cur].keys():
-                    if (not i in route) and ((not vis[i]) or l[i] > l[cur]+self.roadGraph.adj[cur][i][0]):
+                    if (not (i in route)) and ((not vis[i]) or l[i] > l[cur]+self.roadGraph.adj[cur][i][0]):
                         parent[i] = cur
                         l[i] = l[cur]+self.roadGraph.adj[cur][i][0]
                         vis[i] = True
                         q.put(i)
 
+            #update to total length
             length += l[ce]
+
+            #backtracking
             curRoute = []
             curN = ce
-            while True:
+            while curN != cs:
                 curRoute.insert(0, curN)
+                curN = parent[curN]
+            route = route + curRoute
 
+            l = [0 for i in range(len(self.roadGraph.adj))]
+            vis = [False for i in range(len(self.roadGraph.adj))]
+            parent = [None for i in range(len(self.roadGraph.adj))]
+
+            ce = cs
+            cs = self.roadGraph.idToNum[ids[sec]]
+            vis[cs] = True
+            q.put(cs)
+
+        return Route(route, length)
 

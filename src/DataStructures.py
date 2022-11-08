@@ -41,3 +41,9 @@ class RoadGraph:
     def addEdge(self, a, b, dist, azi, parentID):
         t = [dist, azi, parentID]
         self.adj[a][b] = t
+
+#route class with an ordered set of nodes
+class Route:
+    def __init__(self, ids, length):
+        self.ids = ids
+        self.length = length
