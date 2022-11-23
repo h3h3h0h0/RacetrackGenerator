@@ -1,6 +1,4 @@
-import current as current
 from DataStructures import Route
-import OSMHandler
 import GISGrabber
 from copy import deepcopy
 import queue
