@@ -1,5 +1,5 @@
 import requests
-import OSMHandler
+from OSMHandler import OSMHandler
 from geographiclib.geodesic import Geodesic
 from DataStructures import RoadMap, RoadGraph
 
@@ -13,21 +13,26 @@ class GISGrabber:
 
     #get the map info for the area bounded by the specific coordinates, stores it in a file with the specified name
     def getArea(self, l, b, r, t, fileName):
-        fullURL = self.url + "/api/0.6/map?bbox=" + str(l) + "," + str(b) + "," + str(r) + "," + str(t)
+        fullURL = self.url + "api/0.6/map?bbox=" + str(l) + "," + str(b) + "," + str(r) + "," + str(t)
         rawAnswer = requests.get(fullURL)
+
+        print(rawAnswer)
 
         status = rawAnswer.status_code
         if status == 400:
             raise Exception("Bad Request! (Error 400)")
         elif status == 509:
             raise Exception("Bandwidth Limit Exceeded! (Error 509)")
+        elif status == 404:
+            raise Exception ("Not Found (404)")
         else:
-            f = open((fileName + ".osm"), "w")
+            f = open(str(fileName + ".osm"), "w")
             f.write(rawAnswer.text)
             f.close()
+            print("area written to file" + rawAnswer.text)
 
     def readFile(self, fileName):
-        self.handler.apply_file(fileName + ".osm")
+        self.handler.apply_file(str(fileName + ".osm"))
         return self.handler.exportData()
 
     #extracts only suitable roadway data from raw data

@@ -1,5 +1,7 @@
+import time
+
 from DataStructures import Route
-import GISGrabber
+from GISGrabber import GISGrabber
 from copy import deepcopy
 import queue
 

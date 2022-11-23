@@ -1,4 +1,4 @@
-import CombinedMap
+from CombinedMap import CombinedMap
 from DataStructures import RoadData, NodeData, RoadMap, RoadGraph, Route
-import GISGrabber
-import OSMHandler
+from GISGrabber import GISGrabber
+from OSMHandler import OSMHandler
