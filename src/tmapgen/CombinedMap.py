@@ -7,20 +7,33 @@ import queue
 
 #this is a class designed to wrap all the things needed to describe a completed map that is ready to be used
 class CombinedMap:
-    #init from coordinates
-    def __init__(self, url, l, b, r, t, fileName, directional):
-        grabber = GISGrabber(url)
-        grabber.getArea(l, b, r, t, fileName)
+    #init
+    #if an area code is given, use that
+    #use coordinates if no area code and coordinates are given
+    #otherwise assume OSM file already exists
+    def __init__(self, directional, fileName=None, aid=None, l=None, b=None, r=None, t=None):
+        grabber = GISGrabber()
+        if not (aid is None):
+            print("getting by area ID...")
+            self.roadMap = grabber.getAreaByID(aid)
+        elif not (l is None or b is None or r is None or t is None):
+            print("getting by bounds...")
+            self.roadMap = grabber.getArea(l, b, r, t)
+        elif not (fileName is None):
+            print("getting by file...")
+            self.roadMap = grabber.readFile(fileName)
+        else:
+            raise Exception("Not valid data!")
 
-        self.roadMap = grabber.readFile(fileName)
         self.roadGraph = grabber.toGraph(self.roadMap, directional)
         self.directional = directional
 
     #this is to create a new "refined" (i.e. narrowed down to specific road types/surfaces) class
     def refine(self, allowedTypes, allowedSurfaces):
+        grabber = GISGrabber()
         rc = deepcopy(self)
-        rc.roadMap = GISGrabber.getPaths(rc.roadMap, allowedTypes, allowedSurfaces)
-        rc.roadGraph = GISGrabber.toGraph(rc.roadMap, rc.directional)
+        rc.roadMap = grabber.getPaths(rc.roadMap, allowedTypes, allowedSurfaces)
+        rc.roadGraph = grabber.toGraph(rc.roadMap, rc.directional)
 
         return rc
 

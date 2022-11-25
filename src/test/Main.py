@@ -1,11 +1,7 @@
 from tmapgen.CombinedMap import CombinedMap
+from OSMPythonTools.nominatim import Nominatim
 
-test1 = CombinedMap(url="https://api.openstreetmap.org/",
-                    l=-80.6249862,
-                    b=43.4262852,
-                    r=-80.4128576,
-                    t=43.4856153,
-                    fileName="test1",
+test1 = CombinedMap(l=-80.582056, b=43.454726, r=-80.513735, t=43.486805,
                     directional=True)
 
 #all typical roads plus on/off ramps
@@ -15,3 +11,4 @@ surfaces = ["paved", "asphalt", "chipseal", "concrete"]
 
 test1Refined = test1.refine(types, surfaces)
 
+print(str(test1Refined.roadMap.roadWays.keys()))

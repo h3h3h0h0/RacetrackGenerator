@@ -1,35 +1,91 @@
-import requests
+from OSMPythonTools.api import Api
+from OSMPythonTools.overpass import Overpass, overpassQueryBuilder
+from OSMPythonTools.nominatim import Nominatim
 from OSMHandler import OSMHandler
 from geographiclib.geodesic import Geodesic
-from DataStructures import RoadMap, RoadGraph
+from DataStructures import RoadMap, RoadGraph, NodeData, RoadData
+
 
 #this uses HTTP requests to get GIS data from OpenStreetMap
 class GISGrabber:
 
     #the URL is so that this may work with different versions of the map, and not just the current version
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
+        self.op = Overpass()
         self.handler = OSMHandler()
 
     #get the map info for the area bounded by the specific coordinates, stores it in a file with the specified name
-    def getArea(self, l, b, r, t, fileName):
-        fullURL = self.url + "api/0.6/map?bbox=" + str(l) + "," + str(b) + "," + str(r) + "," + str(t)
-        rawAnswer = requests.get(fullURL)
+    def getArea(self, l, b, r, t):
+        print("getArea running...")
 
-        print(rawAnswer)
+        bbox = [b, l, t, r]
 
-        status = rawAnswer.status_code
-        if status == 400:
-            raise Exception("Bad Request! (Error 400)")
-        elif status == 509:
-            raise Exception("Bandwidth Limit Exceeded! (Error 509)")
-        elif status == 404:
-            raise Exception ("Not Found (404)")
-        else:
-            f = open(str(fileName + ".osm"), "w")
-            f.write(rawAnswer.text)
-            f.close()
-            print("area written to file" + rawAnswer.text)
+        query = overpassQueryBuilder(bbox=bbox, elementType='way', selector="highway", out='body')
+        data = self.op.query(query, timeout=1000)
+
+        print("Main download finished!")
+
+        return self.processOPData(data, bbox=bbox)
+
+    def getAreaByID(self, aid):
+        print("getAreaByID running...")
+
+
+        query = overpassQueryBuilder(area=aid, elementType='way', selector="highway", out='body')
+        data = self.op.query(query, timeout=1000)
+
+        print("Main download finished!")
+
+        return self.processOPData(data, area=aid)
+
+    def processOPData(self, data, bbox=None, area=None):
+        roadNodes = {}
+        roadWays = {}
+
+        counter = 0
+
+        nquery = None
+        if not bbox is None:
+            nquery = overpassQueryBuilder(bbox=bbox, elementType='node', out='body')
+        elif not area is None:
+            nquery = overpassQueryBuilder(area=area, elementType='node', out='body')
+        ndata = self.op.query(nquery, timeout=1000)
+
+        for w in data.ways():
+            counter += 1
+            print("processing highway:", w.id(), "processed:", counter, "out of", len(data.ways()), "|", len(w.nodes()), "nodes")
+
+            wayID = w.id()
+            roadType = w.tag("highway")
+            surface = ""
+            # surface data is sometimes inconsistent, so we need this if statement
+            if "surface" in w.tags():
+                surface = w.tag("surface")
+            nodes = []
+
+            idList = []
+            nInfoDict = {}
+            for n in w.nodes():
+                idList.append(n.id())
+                nInfoDict[n.id()] = None
+
+            for n in ndata.nodes():
+                if n.id() in idList:
+                    nInfoDict[n.id()] = [n.lat(), n.lon()]
+
+            # for each node, add the corresponding data to the nodes dictionary, and adds the ID to the array for that way
+            for i in idList:
+                if not nInfoDict[i] is None:
+                    nodeID = i
+                    nodeLat = nInfoDict[i][0]
+                    nodeLon = nInfoDict[i][1]
+
+                    nodes.append(nodeID)
+                    roadNodes[nodeID] = NodeData(nodeLat, nodeLon)
+
+            roadWays[wayID] = RoadData(roadType, surface, nodes)
+
+        return RoadMap(roadNodes, roadWays)
 
     def readFile(self, fileName):
         self.handler.apply_file(str(fileName + ".osm"))
