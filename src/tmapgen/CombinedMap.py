@@ -53,7 +53,7 @@ class CombinedMap:
         length = 0
 
         #the starting point is the first thing in the path
-        route.append(self.roadGraph.numToID[ids[0]])
+        route.append(ids[0])
 
         for sec in range(1, len(ids)):
             # various helper variables for BFS and backtracking
