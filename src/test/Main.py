@@ -18,4 +18,4 @@ test1Refined = test1.refine(types, surfaces)
 
 print(str(test1Refined.roadMap.roadWays.keys()))
 print(str(test1Refined.roadGraph.idToNum))
-print(str(test1Refined.makeRoute([10093608747, 310722370]).ids))
+print(str(test1Refined.makeRoute([10093608747, 310722370, 279396642]).ids))

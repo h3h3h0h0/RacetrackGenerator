@@ -88,8 +88,8 @@ class CombinedMap:
             vis = [False for i in range(len(self.roadGraph.adj))]
             parent = [None for i in range(len(self.roadGraph.adj))]
 
-            ce = cs
-            cs = self.roadGraph.idToNum[ids[sec]]
+            cs = ce
+            ce = self.roadGraph.idToNum[ids[sec]]
             vis[cs] = True
             q.put(cs)
 
