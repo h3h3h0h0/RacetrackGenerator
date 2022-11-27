@@ -1,6 +1,6 @@
 import osmium as osm
 
-from DataStructures import NodeData, RoadData, RoadMap
+from .DataStructures import NodeData, RoadData, RoadMap
 
 class OSMHandler(osm.SimpleHandler):
     #the regular init function for osmium, with 2 dictionaries for road nodes and road ways

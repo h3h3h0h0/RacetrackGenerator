@@ -1,9 +1,9 @@
 from OSMPythonTools.api import Api
 from OSMPythonTools.overpass import Overpass, overpassQueryBuilder
 from OSMPythonTools.nominatim import Nominatim
-from OSMHandler import OSMHandler
+from .OSMHandler import OSMHandler
 from geographiclib.geodesic import Geodesic
-from DataStructures import RoadMap, RoadGraph, NodeData, RoadData
+from .DataStructures import RoadMap, RoadGraph, NodeData, RoadData
 
 
 #this uses HTTP requests to get GIS data from OpenStreetMap
