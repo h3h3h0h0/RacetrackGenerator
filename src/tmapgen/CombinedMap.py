@@ -48,22 +48,26 @@ class CombinedMap:
             if not (i in self.roadGraph.idToNum):
                 raise Exception("Invalid ID in route node list!")
 
-        # various helper variables for BFS and backtracking
+        #route information
         route = []
         length = 0
-        l = [0 for i in range(len(self.roadGraph.adj))]
-        vis = [False for i in range(len(self.roadGraph.adj))]
-        parent = [None for i in range(len(self.roadGraph.adj))]
-        q = queue.Queue()
 
-        # current start/end (for each section between 2 points)
-        cs = self.roadGraph.idToNum[ids[0]]
-        ce = self.roadGraph.idToNum[ids[1]]
-        vis[cs] = True
-        q.put(cs)
-        route.append(self.roadGraph.numToID[cs])
+        #the starting point is the first thing in the path
+        route.append(self.roadGraph.numToID[ids[0]])
 
         for sec in range(1, len(ids)):
+            # various helper variables for BFS and backtracking
+            l = [0 for i in range(len(self.roadGraph.adj))]
+            vis = [False for i in range(len(self.roadGraph.adj))]
+            parent = [None for i in range(len(self.roadGraph.adj))]
+            q = queue.Queue()
+
+            # current start/end (for each section between 2 points)
+            cs = self.roadGraph.idToNum[ids[sec-1]]
+            ce = self.roadGraph.idToNum[ids[sec]]
+            vis[cs] = True
+            q.put(cs)
+
             while not q.empty():
                 cur = q.get()
                 for i in self.roadGraph.adj[cur].keys():
@@ -83,14 +87,5 @@ class CombinedMap:
                 curRoute.insert(0, self.roadGraph.numToID[curN])
                 curN = parent[curN]
             route = route + curRoute
-
-            l = [0 for i in range(len(self.roadGraph.adj))]
-            vis = [False for i in range(len(self.roadGraph.adj))]
-            parent = [None for i in range(len(self.roadGraph.adj))]
-
-            cs = ce
-            ce = self.roadGraph.idToNum[ids[sec]]
-            vis[cs] = True
-            q.put(cs)
 
         return Route(route, length)
