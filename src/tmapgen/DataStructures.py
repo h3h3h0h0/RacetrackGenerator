@@ -43,6 +43,7 @@ class RoadGraph:
         self.adj[a][b] = t
 
 #route class with an ordered set of nodes
+#note that what is stored are the actual IDS, and not the numeric identifiers used in the actual graph search
 class Route:
     def __init__(self, ids, length):
         self.ids = ids

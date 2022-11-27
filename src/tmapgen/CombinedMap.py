@@ -5,12 +5,13 @@ from .GISGrabber import GISGrabber
 from copy import deepcopy
 import queue
 
-#this is a class designed to wrap all the things needed to describe a completed map that is ready to be used
+
+# this is a class designed to wrap all the things needed to describe a completed map that is ready to be used
 class CombinedMap:
-    #init
-    #if an area code is given, use that
-    #use coordinates if no area code and coordinates are given
-    #otherwise assume OSM file already exists
+    # init
+    # if an area code is given, use that
+    # use coordinates if no area code and coordinates are given
+    # otherwise assume OSM file already exists
     def __init__(self, directional, fileName=None, aid=None, l=None, b=None, r=None, t=None):
         grabber = GISGrabber()
         if not (aid is None):
@@ -28,7 +29,7 @@ class CombinedMap:
         self.roadGraph = grabber.toGraph(self.roadMap, directional)
         self.directional = directional
 
-    #this is to create a new "refined" (i.e. narrowed down to specific road types/surfaces) class
+    # this is to create a new "refined" (i.e. narrowed down to specific road types/surfaces) class
     def refine(self, allowedTypes, allowedSurfaces):
         grabber = GISGrabber()
         rc = deepcopy(self)
@@ -37,13 +38,17 @@ class CombinedMap:
 
         return rc
 
-    #makes a route based on a set of points
+    # makes a route based on a set of points
     def makeRoute(self, ids):
-        #need more than one point to make a valid route
+        # need more than one point to make a valid route
         if len(ids) < 2:
             raise Exception("Path needs more than 1 point!")
 
-        #various helper variables for BFS and backtracking
+        for i in ids:
+            if not (i in self.roadGraph.idToNum):
+                raise Exception("Invalid ID in route node list!")
+
+        # various helper variables for BFS and backtracking
         route = []
         length = 0
         l = [0 for i in range(len(self.roadGraph.adj))]
@@ -51,31 +56,31 @@ class CombinedMap:
         parent = [None for i in range(len(self.roadGraph.adj))]
         q = queue.Queue()
 
-        #current start/end (for each section between 2 points)
+        # current start/end (for each section between 2 points)
         cs = self.roadGraph.idToNum[ids[0]]
         ce = self.roadGraph.idToNum[ids[1]]
         vis[cs] = True
         q.put(cs)
-        route.append(cs)
+        route.append(self.roadGraph.numToID[cs])
 
-        for sec in range(1, len(self.roadGraph.adj)):
+        for sec in range(1, len(ids)):
             while not q.empty():
                 cur = q.get()
                 for i in self.roadGraph.adj[cur].keys():
-                    if (not (i in route)) and ((not vis[i]) or l[i] > l[cur]+self.roadGraph.adj[cur][i][0]):
+                    if (not (i in route)) and ((not vis[i]) or l[i] > l[cur] + self.roadGraph.adj[cur][i][0]):
                         parent[i] = cur
-                        l[i] = l[cur]+self.roadGraph.adj[cur][i][0]
+                        l[i] = l[cur] + self.roadGraph.adj[cur][i][0]
                         vis[i] = True
                         q.put(i)
 
-            #update to total length
+            # update to total length
             length += l[ce]
 
-            #backtracking
+            # backtracking
             curRoute = []
             curN = ce
             while curN != cs:
-                curRoute.insert(0, curN)
+                curRoute.insert(0, self.roadGraph.numToID[curN])
                 curN = parent[curN]
             route = route + curRoute
 
@@ -89,4 +94,3 @@ class CombinedMap:
             q.put(cs)
 
         return Route(route, length)
-
