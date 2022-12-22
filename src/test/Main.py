@@ -23,3 +23,6 @@ t1rRoute = test1Refined.makeRoute([10093608747, 310722370, 279396642])
 
 print(str(t1rRoute.ids))
 print(t1rRoute.length)
+print()
+for i in t1rRoute.ids:
+    print(str(test1.roadMap.roadNodes[i].lat), str(test1.roadMap.roadNodes[i].lon))
