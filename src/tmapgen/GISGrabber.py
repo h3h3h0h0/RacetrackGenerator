@@ -20,7 +20,7 @@ class GISGrabber:
 
         bbox = [b, l, t, r]
 
-        query = overpassQueryBuilder(bbox=bbox, elementType='way', selector="highway", out='body')
+        query = overpassQueryBuilder(bbox=bbox, elementType='way', selector="highway", includeGeometry=True, out='body')
         data = self.op.query(query, timeout=1000)
 
         print("Main download finished!")
@@ -31,7 +31,7 @@ class GISGrabber:
         print("getAreaByID running...")
 
 
-        query = overpassQueryBuilder(area=aid, elementType='way', selector="highway", out='body')
+        query = overpassQueryBuilder(area=aid, elementType='way', selector="highway", includeGeometry=True, out='body')
         data = self.op.query(query, timeout=1000)
 
         print("Main download finished!")
