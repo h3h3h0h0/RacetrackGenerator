@@ -20,7 +20,7 @@ class GISGrabber:
 
         bbox = [b, l, t, r]
 
-        query = overpassQueryBuilder(bbox=bbox, elementType='way', selector="highway", includeGeometry=True, out='body')
+        query = overpassQueryBuilder(bbox=bbox, elementType='way', selector="highway", includeGeometry=True, out='geom')
         data = self.op.query(query, timeout=1000)
 
         print("Main download finished!")
@@ -30,8 +30,7 @@ class GISGrabber:
     def getAreaByID(self, aid):
         print("getAreaByID running...")
 
-
-        query = overpassQueryBuilder(area=aid, elementType='way', selector="highway", includeGeometry=True, out='body')
+        query = overpassQueryBuilder(area=aid, elementType='way', selector="highway", includeGeometry=True, out='geom')
         data = self.op.query(query, timeout=1000)
 
         print("Main download finished!")
@@ -66,6 +65,8 @@ class GISGrabber:
             idList = []
             nInfoDict = {}
             for n in w.nodes():
+                if len(n.tags()) != 0:
+                    continue # likely not a geometry node if has tags
                 idList.append(n.id())
                 nInfoDict[n.id()] = None
 
